@@ -11,7 +11,6 @@ def main():
     ap.add_argument("--cbcmodel_path", required=True)
     ap.add_argument("--cbc_id", required=True)
     ap.add_argument("--temp_number", default="0")
-    ap.add_argument("--modifiable", nargs="*", default=[])
     ap.add_argument("--isLoopUpdate", action="store_true")
     args = ap.parse_args()
 
