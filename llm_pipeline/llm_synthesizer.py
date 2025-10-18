@@ -1,38 +1,42 @@
 # llm_pipeline/llm_synthesizer.py
 import json, os
-from dotenv import load_dotenv
 from openai import OpenAI
+from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
-_client = OpenAI()  # uses OPENAI_API_KEY from env
+# Load .env from the repo root regardless of current working dir
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 
-SYSTEM = """You are a synthesis engine for small Java code updates in Correctness-by-Construction workflows.
-Given variables (name, modifiable?, type), a PRE condition and a POST condition (SyGuS-ish syntax), emit ONLY a valid Java code block that mutates ONLY modifiable variables to satisfy POST while preserving PRE where necessary. Avoid changing unmodifiable vars. No imports unless essential. No class/headers—just a method body snippet."""
-# You can tighten this over time.
+# ✅ create global OpenAI client instance
+_client = OpenAI()
 
-def synthesize_java_update(variables, pre_condition_sygus_like, post_condition_sygus_like, is_loop_update=False):
+SYSTEM = """You synthesize SMALL Java statement blocks for Correctness-by-Construction.
+Input: a list of variables (name, modifiable?, type), a PRE condition and a POST condition written in KeY/Java-style logic.
+Task: emit ONLY a valid Java statement block that mutates ONLY modifiable variables so that executing the block in a state
+satisfying PRE leads to a state satisfying POST. No imports or class/method headers. No helpers; use plain Java expressions.
+Return JSON: {"java": "<code>"}."""
+
+def synthesize_java_update(variables, pre_condition_text, post_condition_text, is_loop_update=False):
+    print(">>> Calling LLM for synthesis...")
     var_list = [{"name": n, "modifiable": m, "type": t} for (n,m,t) in variables]
-    user = {
+    user_payload = {
         "variables": var_list,
-        "pre":  pre_condition_sygus_like,
-        "post": post_condition_sygus_like,
-        "style": "emit Java statement block only"
+        "pre_text":  pre_condition_text,
+        "post_text": post_condition_text,
+        "style": "emit Java statement block only",
+        "is_loop_update": bool(is_loop_update),
     }
-    if is_loop_update:
-        user["hint"] = "This is a loop update; ensure variant decreases or invariant preserved."
-
-    # Ask for strict JSON wrapper so it's easy to parse.
-    response = _client.chat.completions.create(
-        model="gpt-5",  # or your preferred model
+    resp = _client.chat.completions.create(
+        model="gpt-5",
         messages=[
-            {"role":"system","content": SYSTEM},
-            {"role":"user","content": json.dumps(user)}
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": json.dumps(user_payload)}
         ],
-        response_format={"type": "json_object"}  # structured output
+        response_format={"type": "json_object"}
     )
-    text = response.choices[0].message.content
-    data = json.loads(text)
-    java = data.get("java", "").strip()
+    print(">>> LLM finished, response received.")
+    data = json.loads(resp.choices[0].message.content)
+    java = (data.get("java") or "").strip()
     if not java:
-        raise RuntimeError("Model did not return 'java' field.")
+        raise RuntimeError("Model did not return a 'java' field.")
     return java

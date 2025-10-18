@@ -1,20 +1,36 @@
 import re
-from lark import Lark
 from lark import Lark, Tree, Token
-
-from FormulaTree import (
-    parse_tree,
-    delete_unary_wrapper,
-    delete_function,
-    simplify_and_or,
-    remove_cast,
-    replace_fn_name,
-    simplify_created,
-    replace_array_access,
-    remove_null_check,
-    flatten_and_or,
+try:
+    from .FormulaTree import (
+        parse_tree,
+        delete_unary_wrapper,
+        delete_function,
+        simplify_and_or,
+        remove_cast,
+        replace_fn_name,
+        simplify_created,
+        replace_array_access,
+        remove_null_check,
+        flatten_and_or,
+        Formula,
+        AtomicArgument,
 )
-from FormulaTree import Formula, AtomicArgument
+except ImportError:
+    # fallback if someone runs files directly
+    from FormulaTree import (
+        parse_tree,
+        delete_unary_wrapper,
+        delete_function,
+        simplify_and_or,
+        remove_cast,
+        replace_fn_name,
+        simplify_created,
+        replace_array_access,
+        remove_null_check,
+        flatten_and_or,
+        Formula,
+        AtomicArgument,
+    )
 
 
 def print_tree(tree, indent=0):
