@@ -1,42 +1,137 @@
 # llm_pipeline/llm_synthesizer.py
-import json, os
-from openai import OpenAI
-from dotenv import load_dotenv
+import os, json, re, time
 from pathlib import Path
 
-# Load .env from the repo root regardless of current working dir
+from dotenv import load_dotenv
+from openai import OpenAI
+import httpx
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Environment / client
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Always load .env from project root (…/SynthAI/.env or your repo root)
 load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 
-# ✅ create global OpenAI client instance
-_client = OpenAI()
+API_KEY = os.getenv("OPENAI_API_KEY")
+if not API_KEY:
+    raise RuntimeError("OPENAI_API_KEY not found. Put it in your project .env")
 
-SYSTEM = """You synthesize SMALL Java statement blocks for Correctness-by-Construction.
-Input: a list of variables (name, modifiable?, type), a PRE condition and a POST condition written in KeY/Java-style logic.
-Task: emit ONLY a valid Java statement block that mutates ONLY modifiable variables so that executing the block in a state
-satisfying PRE leads to a state satisfying POST. No imports or class/method headers. No helpers; use plain Java expressions.
-Return JSON: {"java": "<code>"}."""
+# Configurable via env (or leave defaults)
+MODEL_PRIMARY   = os.getenv("LLM_MODEL", "gpt-4o-mini")    # you verified this works
+MODEL_FALLBACK  = os.getenv("LLM_MODEL_FALLBACK", "gpt-4-0613")
+CLIENT_TIMEOUT  = float(os.getenv("LLM_TIMEOUT",  "60"))  # seconds
+CLIENT_RETRIES  = int(os.getenv("LLM_RETRIES",    "1"))
 
-def synthesize_java_update(variables, pre_condition_text, post_condition_text, is_loop_update=False):
-    print(">>> Calling LLM for synthesis...")
-    var_list = [{"name": n, "modifiable": m, "type": t} for (n,m,t) in variables]
-    user_payload = {
+# Single client reused across calls
+_client = OpenAI(api_key=API_KEY, timeout=CLIENT_TIMEOUT, max_retries=CLIENT_RETRIES)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Prompt + utilities
+# ──────────────────────────────────────────────────────────────────────────────
+
+SYSTEM = """You are a small-step synthesis assistant for Java updates in CbC/KeY workflows.
+Rules:
+- Modify only variables flagged 'modifiable'.
+- Prefer simple, loop-free updates unless 'is_loop_update' is true.
+- Obey PRE/POST given in SyGuS-like syntax (and, or, =, <, <=, ite, seq.nth, seq.len, etc.).
+- Do not change method signatures or declare new fields.
+- Avoid undefined helpers; use plain Java expressions only.
+Return JSON: {"java": "<code>"} with only the Java code lines to insert into the Statement.
+"""
+
+# remove low-value boilerplate from PRE/POST to shrink tokens/latency
+NOISE_PATTERNS = [
+    r'\bwellFormed\s*\(\s*heap\s*\)',
+    r'\b[A-Za-z0-9_]+\.<created>\s*=\s*TRUE',
+    r'\bheapAtPre\s*:=\s*heap',
+    r'\s{2,}',  # collapse long spaces
+]
+
+def shrink_spec(text: str, limit: int = 6000) -> str:
+    s = text
+    for pat in NOISE_PATTERNS:
+        s = re.sub(pat, ' ', s)
+    # normalize whitespace and trim
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s[:limit]
+
+def _parse_java_from_response(content: str) -> str:
+    """
+    We ask for JSON like: {"java": "<code>"}.
+    If the model returns code fences or plain text, do a best-effort extract.
+    """
+    # Try JSON first
+    try:
+        data = json.loads(content)
+        java = (data.get("java") or "").strip()
+        if java:
+            return java
+    except Exception:
+        pass
+
+    # Try fenced blocks ```java ... ``` or ``` ... ```
+    m = re.search(r"```(?:java)?\s*(.*?)```", content, flags=re.S)
+    if m:
+        return m.group(1).strip()
+
+    # Fallback: return content as-is (caller may validate)
+    return content.strip()
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Main entry
+# ──────────────────────────────────────────────────────────────────────────────
+
+def synthesize_java_update(variables, pre_condition_text, post_condition_text, is_loop_update=False) -> str:
+    """
+    variables: list[(name, modifiable: bool, type)]
+    pre_condition_text / post_condition_text: KeY/Java-style logic strings
+    is_loop_update: bool (we pass it through so the model may choose a loop-friendly update)
+    """
+    # Prepare payload
+    var_list = [{"name": n, "modifiable": m, "type": t} for (n, m, t) in variables]
+    payload = {
         "variables": var_list,
-        "pre_text":  pre_condition_text,
-        "post_text": post_condition_text,
+        "pre_text":  shrink_spec(pre_condition_text),
+        "post_text": shrink_spec(post_condition_text),
         "style": "emit Java statement block only",
         "is_loop_update": bool(is_loop_update),
     }
-    resp = _client.chat.completions.create(
-        model="gpt-5",
-        messages=[
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": json.dumps(user_payload)}
-        ],
-        response_format={"type": "json_object"}
-    )
-    print(">>> LLM finished, response received.")
-    data = json.loads(resp.choices[0].message.content)
-    java = (data.get("java") or "").strip()
-    if not java:
-        raise RuntimeError("Model did not return a 'java' field.")
-    return java
+    payload_text = json.dumps(payload, ensure_ascii=False)
+
+    def _call(model: str) -> str:
+        print(f">>> Calling LLM model={model} (payload chars={len(payload_text)})")
+        t0 = time.time()
+        # NOTE: We intentionally do NOT use response_format here for maximum compatibility
+        resp = _client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": SYSTEM},
+                {"role": "user",    "content": payload_text},
+            ],
+            # You can set temperature etc. here if you like:
+            # temperature=0.2,
+            timeout=CLIENT_TIMEOUT,  # per-call timeout safeguard
+            store=True
+        )
+        print(resp.__str__)
+        took = time.time() - t0
+        content = resp.choices[0].message.content or ""
+        java = _parse_java_from_response(content)
+        print(f">>> LLM finished in {took:.1f}s, code chars={len(java)}")
+        if not java:
+            raise RuntimeError("Model returned empty 'java' code.")
+        return java
+
+    try:
+        return _call(MODEL_PRIMARY)
+    except (httpx.TimeoutException, httpx.ReadError, httpx.ConnectError) as e:
+        print(f"!!! LLM timeout/network error on {MODEL_PRIMARY}: {e}. Retrying with fallback {MODEL_FALLBACK}...")
+        return _call(MODEL_FALLBACK)
+    except Exception as e:
+        # Last resort: try fallback once for other errors (e.g., model not available)
+        print(f"!!! LLM error on {MODEL_PRIMARY}: {e}. Trying fallback {MODEL_FALLBACK}...")
+        return _call(MODEL_FALLBACK)
