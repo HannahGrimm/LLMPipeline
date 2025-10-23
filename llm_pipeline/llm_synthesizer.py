@@ -18,11 +18,23 @@ API_KEY = os.getenv("OPENAI_API_KEY")
 if not API_KEY:
     raise RuntimeError("OPENAI_API_KEY not found. Put it in your project .env")
 
+<<<<<<< Updated upstream
 # Configurable via env (or leave defaults)
 MODEL_PRIMARY   = os.getenv("LLM_MODEL", "gpt-4o-mini")    # you verified this works
 MODEL_FALLBACK  = os.getenv("LLM_MODEL_FALLBACK", "gpt-4-0613")
 CLIENT_TIMEOUT  = float(os.getenv("LLM_TIMEOUT",  "60"))  # seconds
 CLIENT_RETRIES  = int(os.getenv("LLM_RETRIES",    "1"))
+=======
+SYSTEM = """You are a small-step synthesis assistant for Java updates in CbC/KeY workflows.
+Rules:
+- Modify only variables flagged 'modifiable'.
+- Prefer simple, loop-free updates unless 'is_loop_update' is true.
+- Obey PRE/POST given in SyGuS-like syntax.
+- Do not change method signatures or declare new fields.
+- Avoid undefined helpers; use plain Java expressions only.
+- Output EXACTLY JSON: {"java":"<code>"} where <code> is Java statements separated by \n, no comments, no extra keys.
+"""
+>>>>>>> Stashed changes
 
 # Single client reused across calls
 _client = OpenAI(api_key=API_KEY, timeout=CLIENT_TIMEOUT, max_retries=CLIENT_RETRIES)

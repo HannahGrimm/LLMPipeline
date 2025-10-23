@@ -1,3 +1,8 @@
 ['start', 'setup', 'extract', 'read_vars', 'prep_prompt', 'start_synth', 'end_synth', 'splice', 'verify', 'done']
+<<<<<<< Updated upstream
 [0, 4, 5, 6, 6, 1061, 1062, 8511]
 [4, 1, 1, 0, 1055, 1, 7449]
+=======
+[0, 22, 36, 60, 60, 39402, 39405, 40246]
+[22, 14, 24, 0, 39342, 3, 841]
+>>>>>>> Stashed changes
