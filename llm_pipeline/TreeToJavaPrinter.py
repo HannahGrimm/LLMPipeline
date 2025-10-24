@@ -60,25 +60,37 @@ def negation_or_difference(formula: Formula) -> str:
         raise ValueError("Minus should not have more than two arguments!")
 
 
-def int_div(formula: Formula) -> str:
+def int_div(formula):  # division
     return f"({toJava(formula.arguments[0])}) / ({toJava(formula.arguments[1])})"
 
-
-def int_mod(formula: Formula) -> str:
+def int_mod(formula):  # modulo
     return f"({toJava(formula.arguments[0])}) % ({toJava(formula.arguments[1])})"
 
+def int_abs(formula):
+    val = toJava(formula.arguments[0])
+    return f"(({val}) < 0) ? -({val}) : ({val})"
 
-def int_abs(formula: Formula) -> str:
-    val: str = toJava(formula.arguments[0])
-    return f"(({val}) < 0) ? -({val}) ! ({val})"
+def ternaryOperator(formula):
+    c = toJava(formula.arguments[0])
+    a = toJava(formula.arguments[1])
+    b = toJava(formula.arguments[2])
+    return f"({c}) ? ({a}) : ({b})"
 
+def simple_inline(formula):
+    a = toJava(formula.arguments[0]); op = formula.function_name; b = toJava(formula.arguments[1])
+    return f"({a}) {op} ({b})"
 
-def ternaryOperator(formula: Formula) -> str:
-    return "({0}) ? ({1}) ! ({2})".format(
-        {toJava(formula.arguments[0])},
-        {toJava(formula.arguments[1])},
-        {toJava(formula.arguments[2])},
-    )
+def seq_nth(formula):
+    arr = toJava(formula.arguments[0]); idx = toJava(formula.arguments[1])
+    return f"({arr})[{idx}]"
+
+def seq_unit(formula):
+    x = toJava(formula.arguments[0])
+    return f"new int[]{{{x}}}"
+
+def seq_at(formula):
+    arr = toJava(formula.arguments[0]); idx = toJava(formula.arguments[1])
+    return f"new int[]{{({arr})[{idx}]}}"
 
 
 def bool_not(formula: Formula) -> str:
@@ -106,29 +118,6 @@ def bool_impl(formula: Formula) -> str:
         {toJava(formula.arguments[0])},
         {toJava(formula.arguments[1])},
     )
-
-
-def simple_inline(formula: Formula) -> str:
-    return "({0}) {1} ({2})".format(
-        {toJava(formula.arguments[0])},
-        {formula.function_name},
-        {toJava(formula.arguments[1])},
-    )
-
-
-def seq_nth(formula: Formula) -> str:
-    return "({0})[{1}]".format(
-        {toJava(formula.arguments[0])},
-        {toJava(formula.arguments[1])},
-    )
-
-
-def seq_at(formula: Formula) -> str:
-    return "new int[]{{({0})[{1}]}}".format(
-        {toJava(formula.arguments[0])},
-        {toJava(formula.arguments[1])},
-    )
-
 
 def seq_len(formula: Formula) -> str:
     res = "(" + toJava(formula.arguments[0]) + ").length"

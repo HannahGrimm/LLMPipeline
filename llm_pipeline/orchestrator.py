@@ -105,15 +105,23 @@ def execute_llm_pipeline(info: dict) -> bool:
     _splice_llm_code(temp_key, verify_key, java_codeblock)
     info["timestamps"].append(time.time())
 
-    # run KeY (headless) for verification; we reuse your run_key wrapper
-    # Using --openGoalsSmtPath is fine; KeY exits 0 on success.
+    # Resolve KeY jar BEFORE calling run_key
     key_file = normpath(join(dirname(__file__), "..", "pythonScripts", "key-2.13.0-exe.jar"))
-    run_key(key_file, verify_key, temp_folder)
+    if not exists(key_file):
+        alt = normpath(join(info.get("src_dir", ""), "pythonScripts", "key-2.13.0-exe.jar"))
+        if exists(alt):
+            key_file = alt
+        else:
+            raise FileNotFoundError(f"KeY jar not found at:\n  {key_file}\n  {alt}")
+
+    # Run KeY (headless)
+    rc = run_key(key_file, verify_key, temp_folder)
     info["timestamps"].append(time.time())
 
-    # timing
+    # record timing file and return truthy only on success
     with open(join(temp_folder, "times.txt"), "w", encoding="utf-8") as f:
-        from .postprocess import write_timefile
         write_timefile(f.name, TIME_POINTS, info["timestamps"])
-    return True
+
+    return rc == 0
+
 
