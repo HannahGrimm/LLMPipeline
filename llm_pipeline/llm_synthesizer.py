@@ -19,7 +19,7 @@ if not API_KEY:
     raise RuntimeError("OPENAI_API_KEY not found. Put it in your project .env")
 
 # Configurable via env (or leave defaults)
-MODEL_PRIMARY   = os.getenv("LLM_MODEL", "gpt-5-mini-2025-08-07")    # you verified this works
+MODEL_PRIMARY   = os.getenv("LLM_MODEL", "gpt-5-2025-08-07")    # you verified this works
 MODEL_FALLBACK  = os.getenv("LLM_MODEL_FALLBACK", "gpt-4-0613")
 CLIENT_TIMEOUT  = float(os.getenv("LLM_TIMEOUT",  "3600"))  # seconds
 CLIENT_RETRIES  = int(os.getenv("LLM_RETRIES",    "1"))

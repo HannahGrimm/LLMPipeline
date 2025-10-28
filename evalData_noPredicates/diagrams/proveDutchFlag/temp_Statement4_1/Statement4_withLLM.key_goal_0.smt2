@@ -49,13 +49,13 @@
 (declare-const |field_java.lang.Object::<created>| U)
 (declare-fun k_wellFormed (U) Bool)
 (declare-fun u_heapAtPre () U)
-(declare-const sort_java.lang.Object T)
 (declare-const sort_any T)
-(declare-const |sort_int[]| T)
-(declare-const sort_Null T)
+(declare-const sort_java.lang.Object T)
 (declare-const sort_Heap T)
+(declare-const |sort_int[]| T)
 (declare-const sort_Field T)
-(assert (distinct sort_boolean sort_java.lang.Object sort_int sort_any |sort_int[]| sort_Null sort_Heap sort_Field))
+(declare-const sort_Null T)
+(assert (distinct sort_any sort_boolean sort_java.lang.Object sort_int sort_Heap |sort_int[]| sort_Field sort_Null))
 
 ; --- Axioms
 
@@ -99,8 +99,6 @@
 (assert (forall ((var_h U) (var_o U) (var_f U)) (! (=> (and (instanceof var_h sort_Heap) (instanceof var_o sort_java.lang.Object) (instanceof var_f sort_Field)) (=> (k_wellFormed var_h) (or (= (cast (k_select var_h (cast (k_select var_h var_o var_f) sort_java.lang.Object) |field_java.lang.Object::<created>|) sort_boolean) (b2u true)) (= (cast (k_select var_h var_o var_f) sort_java.lang.Object) k_null)))) :pattern ((cast (k_select var_h var_o var_f) sort_java.lang.Object)))))
 (assert (instanceof u_heapAtPre sort_Heap))
 (declare-const unknown_0 U)
-(assert (subtype |sort_int[]| sort_java.lang.Object))
-(assert (subtype sort_Null sort_java.lang.Object))
 (assert (subtype sort_boolean sort_any))
 (assert (not (subtype sort_boolean sort_java.lang.Object)))
 (assert (not (subtype sort_boolean sort_int)))
@@ -126,6 +124,8 @@
 (assert (not (subtype sort_Field sort_java.lang.Object)))
 (assert (not (subtype sort_Field sort_int)))
 (assert (not (subtype sort_Field sort_Heap)))
+(assert (subtype |sort_int[]| sort_java.lang.Object))
+(assert (subtype sort_Null sort_java.lang.Object))
 (assert (subtype sort_Null |sort_int[]|))
 
 ; --- Sequent
@@ -134,4 +134,4 @@
 (check-sat)
 
 ; --- Translation of unknown values
-; unknown_0 :  \<{  bb--;}\> (and(and(and(and(and(and(and(all{q:int}(imp(and(geq(q,Z(0(#))),lt(q,wb)),equals(int::select(heap,A,arr(q)),Z(0(#))))),all{q:int}(imp(and(geq(q,wb),lt(q,wt)),equals(int::select(heap,A,arr(q)),Z(1(#)))))),all{q:int}(imp(and(geq(q,bb),lt(q,length(A))),equals(int::select(heap,A,arr(q)),Z(2(#)))))),leq(Z(0(#)),wb)),leq(wb,wt)),leq(wt,bb)),leq(bb,length(A))),gt(variantVar0,sub(bb,wt))))
+; unknown_0 :  \<{  t = A[wt];  A[wt] = A[bb - 1];  A[bb - 1] = t;  bb = bb - 1;}\> (and(and(and(and(and(and(and(all{q:int}(imp(and(geq(q,Z(0(#))),lt(q,wb)),equals(int::select(heap,A,arr(q)),Z(0(#))))),all{q:int}(imp(and(geq(q,wb),lt(q,wt)),equals(int::select(heap,A,arr(q)),Z(1(#)))))),all{q:int}(imp(and(geq(q,bb),lt(q,length(A))),equals(int::select(heap,A,arr(q)),Z(2(#)))))),leq(Z(0(#)),wb)),leq(wb,wt)),leq(wt,bb)),leq(bb,length(A))),gt(variantVar0,sub(bb,wt))))
