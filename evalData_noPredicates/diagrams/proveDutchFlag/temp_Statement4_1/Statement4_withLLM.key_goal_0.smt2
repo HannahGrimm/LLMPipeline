@@ -134,4 +134,4 @@
 (check-sat)
 
 ; --- Translation of unknown values
-; unknown_0 :  \<{  wt++;}\> (and(and(and(and(and(and(and(all{q:int}(imp(and(geq(q,Z(0(#))),lt(q,wb)),equals(int::select(heap,A,arr(q)),Z(0(#))))),all{q:int}(imp(and(geq(q,wb),lt(q,wt)),equals(int::select(heap,A,arr(q)),Z(1(#)))))),all{q:int}(imp(and(geq(q,bb),lt(q,length(A))),equals(int::select(heap,A,arr(q)),Z(2(#)))))),leq(Z(0(#)),wb)),leq(wb,wt)),leq(wt,bb)),leq(bb,length(A))),gt(variantVar0,sub(bb,wt))))
+; unknown_0 :  \<{  bb--;}\> (and(and(and(and(and(and(and(all{q:int}(imp(and(geq(q,Z(0(#))),lt(q,wb)),equals(int::select(heap,A,arr(q)),Z(0(#))))),all{q:int}(imp(and(geq(q,wb),lt(q,wt)),equals(int::select(heap,A,arr(q)),Z(1(#)))))),all{q:int}(imp(and(geq(q,bb),lt(q,length(A))),equals(int::select(heap,A,arr(q)),Z(2(#)))))),leq(Z(0(#)),wb)),leq(wb,wt)),leq(wt,bb)),leq(bb,length(A))),gt(variantVar0,sub(bb,wt))))

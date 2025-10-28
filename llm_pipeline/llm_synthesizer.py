@@ -21,7 +21,7 @@ if not API_KEY:
 # Configurable via env (or leave defaults)
 MODEL_PRIMARY   = os.getenv("LLM_MODEL", "gpt-5-mini-2025-08-07")    # you verified this works
 MODEL_FALLBACK  = os.getenv("LLM_MODEL_FALLBACK", "gpt-4-0613")
-CLIENT_TIMEOUT  = float(os.getenv("LLM_TIMEOUT",  "60"))  # seconds
+CLIENT_TIMEOUT  = float(os.getenv("LLM_TIMEOUT",  "3600"))  # seconds
 CLIENT_RETRIES  = int(os.getenv("LLM_RETRIES",    "1"))
 
 # Single client reused across calls
@@ -33,32 +33,28 @@ _client = OpenAI(api_key=API_KEY, timeout=CLIENT_TIMEOUT, max_retries=CLIENT_RET
 # ──────────────────────────────────────────────────────────────────────────────
 
 SYSTEM = """
-You are a small-step synthesis assistant for Java updates in CbC/KeY workflows.
+You are a small-step synthesis assistant for Java updates in CbC/KeY workflows. 
+Your task is to generate the minimal but logically sufficient Java statement block 
+that transforms any state satisfying the PRE-condition into one satisfying the POST-condition.
 
-Your goal:
-Generate the smallest possible Java statement block that, when executed in any state satisfying the given PRE-condition, produces a state satisfying the given POST-condition.
-
-Input format (JSON):
-{
-  "variables": [{"name": str, "modifiable": bool, "type": str}, ...],
-  "pre_text": str,
-  "post_text": str,
-  "style": str,
-  "is_loop_update": bool
-}
+Input format (JSON): { "variables": [{"name": str, "modifiable": bool, "type": str}, ...], "pre_text": str, "post_text": str, "style": str, "is_loop_update": bool }
 
 Rules:
 - Modify only variables flagged "modifiable".
-- Never modify or write to non-modifiable variables (e.g., arrays marked non-modifiable).
+- Never modify or write to non-modifiable variables.
 - Prefer straight-line (loop-free) code unless "is_loop_update" is true.
-- Use only the declared variables and their types. No new variables unless one is provided and marked modifiable.
-- Use plain Java expressions only (no undefined helpers, no methods, no class headers).
-- Array access must stay in bounds implied by PRE.
-- Ensure the POST-condition holds after execution and preserve partition structure implied by PRE.
-- If a variant appears (e.g., "variantVar0 = bb - wt" → "variantVar0 > bb - wt"), strictly decrease it (e.g., increase wt or decrease bb).
+- Use only declared variables and their types. No new variables.
+- Use plain Java expressions only (no methods, helpers, or class/method headers).
+- You may read from non-modifiable arrays or objects to use their values in assignments.
+- If a swap or movement between array partitions is required by the pre/post difference 
+  (e.g., element classification boundaries shift or an element crosses between partitions), 
+  you must perform the appropriate value swap using a temporary modifiable variable if available.
+- Ensure array accesses remain within bounds implied by PRE.
+- Always ensure that the variant variable strictly decreases when present.
+- Produce all statements necessary to make POST true — not just the minimal syntactic change, 
+  but the minimal *semantic* change that preserves all invariants and updates all affected variables.
 - If "style" contains "emit Java statement block only", output code only, with no prose.
-- Always output EXACTLY this JSON format:
-  {"java": "<Java statements separated by semicolons>"}
+- Always output EXACTLY this JSON format: {"java": "<Java statements separated by semicolons>"}
 """
 
 
