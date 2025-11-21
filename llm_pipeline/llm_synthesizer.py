@@ -24,8 +24,42 @@ MODEL_FALLBACK  = os.getenv("LLM_MODEL_FALLBACK", "gpt-4-0613")
 CLIENT_TIMEOUT  = float(os.getenv("LLM_TIMEOUT",  "3600"))  # seconds
 CLIENT_RETRIES  = int(os.getenv("LLM_RETRIES",    "1"))
 
+# Path to Helper.java – overridable via env, but defaults to your given path
+HELPER_JAVA_PATH = os.getenv(
+    "HELPER_JAVA_PATH",
+    r"C:\Users\hanna\OneDrive\Dokumente\LLMPipeline\evalData_noPredicates\Helper.java",
+)
+
 # Single client reused across calls
 _client = OpenAI(api_key=API_KEY, timeout=CLIENT_TIMEOUT, max_retries=CLIENT_RETRIES)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Helper.java loading
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _load_helper_java_source() -> str:
+    """
+    Load the contents of Helper.java so the model can see the helper methods.
+    If the file cannot be read, return an empty string and log a warning.
+    """
+    if not HELPER_JAVA_PATH:
+        print("!!! HELPER_JAVA_PATH not set; no Helper.java will be provided to the LLM.")
+        return ""
+
+    path = Path(HELPER_JAVA_PATH)
+    try:
+        text = path.read_text(encoding="utf-8")
+        # Optionally, you could truncate if this ever becomes very large.
+        print(f">>> Loaded Helper.java from {path} (chars={len(text)})")
+        return text
+    except Exception as e:
+        print(f"!!! Could not read Helper.java at {path}: {e}")
+        return ""
+
+
+# Cache so we do not re-read on every call
+_HELPER_JAVA_SOURCE = _load_helper_java_source()
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -44,7 +78,6 @@ Rules:
 - Never modify or write to non-modifiable variables.
 - Prefer straight-line (loop-free) code unless "is_loop_update" is true.
 - Use only declared variables and their types. No new variables.
-- Use plain Java expressions only (no methods, helpers, or class/method headers).
 - You may read from non-modifiable arrays or objects to use their values in assignments.
 - If a swap or movement between array partitions is required by the pre/post difference 
   (e.g., element classification boundaries shift or an element crosses between partitions), 
@@ -54,9 +87,14 @@ Rules:
 - Produce all statements necessary to make POST true — not just the minimal syntactic change, 
   but the minimal *semantic* change that preserves all invariants and updates all affected variables.
 - If "style" contains "emit Java statement block only", output code only, with no prose.
+- You may call helper methods from the provided Helper.java file (e.g., Helper.someMethod(...)),
+  but you must not modify Helper.java itself. Treat these helper methods as already correctly implemented.
 - Always output EXACTLY this JSON format: {"java": "<Java statements separated by semicolons>"}
-"""
 
+The user message will contain:
+1. A single JSON object with the synthesis task (variables, PRE, POST, style, is_loop_update).
+2. After that JSON, the complete source code of Helper.java in a comment-style block.
+"""
 
 # remove low-value boilerplate from PRE/POST to shrink tokens/latency
 NOISE_PATTERNS = [
@@ -106,6 +144,9 @@ def synthesize_java_update(variables, pre_condition_text, post_condition_text, i
     variables: list[(name, modifiable: bool, type)]
     pre_condition_text / post_condition_text: KeY/Java-style logic strings
     is_loop_update: bool (we pass it through so the model may choose a loop-friendly update)
+
+    This version additionally provides the contents of Helper.java to the LLM so that
+    the synthesized Java update is allowed to call methods defined there (e.g., Helper.foo()).
     """
     # Prepare payload
     var_list = [{"name": n, "modifiable": m, "type": t} for (n, m, t) in variables]
@@ -118,15 +159,31 @@ def synthesize_java_update(variables, pre_condition_text, post_condition_text, i
     }
     payload_text = json.dumps(payload, ensure_ascii=False)
 
+    # Combine synthesis payload and helper source for the user message.
+    # The model first sees the JSON, then the Helper.java code in a clearly delimited block.
+    if _HELPER_JAVA_SOURCE:
+        user_content = (
+            payload_text
+            + "\n\n/*\n"
+            + "==================== Helper.java (available helper methods) ====================\n"
+            + _HELPER_JAVA_SOURCE
+            + "\n===============================================================================\n"
+            + "*/\n"
+        )
+    else:
+        # If Helper.java could not be loaded, just send the payload as before.
+        user_content = payload_text
+
     def _call(model: str) -> str:
-        print(f">>> Calling LLM model={model} (payload chars={len(payload_text)})")
+        print(f">>> Calling LLM model={model} (payload chars={len(payload_text)}, "
+              f"user_content chars={len(user_content)})")
         t0 = time.time()
         # NOTE: We intentionally do NOT use response_format here for maximum compatibility
         resp = _client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": SYSTEM},
-                {"role": "user",    "content": payload_text},
+                {"role": "user",    "content": user_content},
             ],
             # You can set temperature etc. here if you like:
             # temperature=0.2,
