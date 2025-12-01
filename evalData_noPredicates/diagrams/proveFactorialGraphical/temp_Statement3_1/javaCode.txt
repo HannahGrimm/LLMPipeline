@@ -1,1 +1,1 @@
-f = Helper.factorial2(n);
+f = Helper.factorial(n);

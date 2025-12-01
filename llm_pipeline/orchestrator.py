@@ -9,9 +9,9 @@ from .postprocess import write_timefile
 TIME_POINTS = ["start","setup","extract","read_vars","prep_prompt","start_synth","end_synth","splice","verify","done"]
 
 _SANITIZE_REPLACEMENTS = [
-    (r'(?mi)^\s*\\javaSource\b.*\n', ''),
-    (r'(?mi)^\s*\\classpath\b.*\n', ''),
-    (r'(?mi)^\s*\\bootclasspath\b.*\n', ''),
+    # Only remove bootclasspath lines by default. We preserve \javaSource and \classpath so KeY
+    # can resolve project classes and helper types.
+    (r'(?mi)^\\s*\\bootclasspath\b.*\\n', ''),
 ]
 
 def _sanitize_key_file(path: str, replacement_java_src: str | None = None) -> None:
@@ -34,8 +34,35 @@ def _setup_temp(statement_path: str, temp_folder: str, statement_file: str) -> s
     helper_src = join(dirname(statement_path), "helper.key")
     if exists(helper_src):
         shutil.copyfile(helper_src, join(temp_folder, "helper.key"))
-    _sanitize_key_file(dst_key, replacement_java_src=dirname(statement_path))
+    _sanitize_key_file(dst_key)
+    _warn_if_java_sources_missing(dst_key)
     return dst_key
+
+
+def _warn_if_java_sources_missing(key_path: str) -> None:
+    r"""Print a helpful message if any \javaSource or \classpath paths in the key do not exist.
+    This helps diagnose KeY 'Could not find' errors due to missing runtime sources.
+    """
+    import re
+    java_source_re = re.compile(r'(?mi)^\\javaSource\s+"([^"]+)";?')
+    classpath_re = re.compile(r'(?mi)^\\classpath\s+"([^"]+)";?')
+    try:
+        with open(key_path, 'r', encoding='utf-8') as f:
+            for i, line in enumerate(f):
+                if i > 50:
+                    break
+                m = java_source_re.search(line)
+                if m:
+                    path = m.group(1)
+                    if not os.path.exists(path):
+                        print(f"!!! Warning: \\javaSource path not found: {path}")
+                m2 = classpath_re.search(line)
+                if m2:
+                    path = m2.group(1)
+                    if not os.path.exists(path):
+                        print(f"!!! Warning: \\classpath path not found: {path}")
+    except Exception:
+        pass
 
 def _splice_llm_code(original_key_path: str, output_key_path: str, llm_code: str) -> None:
     with open(original_key_path, "r", encoding="utf-8") as f:
@@ -73,35 +100,8 @@ def _splice_llm_code(original_key_path: str, output_key_path: str, llm_code: str
         f.write(patched)
 
 
-def _insert_java_source_after_invariant(path: str, java_source_line: str) -> None:
-    """Insert `java_source_line` after the first line containing 'isLoopInvariant' (case-insensitive).
-    If no such line is found, prepend the javaSource at the top. Does nothing if the exact java_source_line
-    already exists in the file.
-    """
-    with open(path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
+# removed: _insert_java_source_after_invariant was removed to avoid injecting \javaSource causing Helper.java compilation issues
 
-    # normalize search
-    found = False
-    # avoid duplicating the same javaSource line
-    stripped_target = java_source_line.strip()
-    if any(stripped_target in l for l in lines):
-        return
-
-    for i, line in enumerate(lines):
-        if re.search(r'isloopinvariant', line, re.IGNORECASE):
-            insert_line = java_source_line if java_source_line.endswith('\n') else java_source_line + '\n'
-            lines.insert(i + 1, insert_line)
-            found = True
-            break
-
-    if not found:
-        # fallback: prepend to file
-        insert_line = java_source_line if java_source_line.endswith('\n') else java_source_line + '\n'
-        lines.insert(0, insert_line)
-
-    with open(path, "w", encoding="utf-8") as f:
-        f.writelines(lines)
 
 
 def _parse_is_loop_update_from_key(path: str) -> bool | None:
@@ -179,9 +179,8 @@ def execute_llm_pipeline(info: dict) -> bool:
     # splice code into a verification .key and run KeY once
     verify_key = join(temp_folder, info["statement_file"] + "_withLLM.key")
     _splice_llm_code(temp_key, verify_key, java_codeblock)
-    # Insert explicit javaSource pointing to the evalData_noPredicates folder after isLoopInvariant
-    java_src_line = '\\javaSource "C:\\Users\\hanna\\OneDrive\\Dokumente\\LLMPipeline\\evalData_noPredicates";'
-    _insert_java_source_after_invariant(verify_key, java_src_line)
+    # NOTE: we no longer inject a \javaSource line here to avoid KeY trying to compile
+    # Helper.java in isolation; the pipeline continues to copy helper.key into the temp folder.
     info["timestamps"].append(time.time())
 
     # Resolve KeY jar BEFORE calling run_key
