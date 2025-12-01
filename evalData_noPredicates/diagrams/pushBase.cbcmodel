@@ -213,11 +213,12 @@
     </statement>
     <preCondition name="pre"/>
     <postCondition name="post"/>
-    <methodObj href="IntList.cbcclass#//@methods.2"/>
   </de.tu-bs.cs.isf.cbc.cbcmodel:CbCFormula>
   <de.tu-bs.cs.isf.cbc.cbcmodel:JavaVariables>
     <variables name="int i"/>
     <variables name="int[] tmp"/>
+    <variables name="int newTop"/>
+    <variables name="int[] data"/>
   </de.tu-bs.cs.isf.cbc.cbcmodel:JavaVariables>
   <de.tu-bs.cs.isf.cbc.cbcmodel:GlobalConditions>
     <conditions name="data != null"/>
