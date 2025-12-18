@@ -1,1 +1,0 @@
-tmp[tmp.length - 1] = newTop;

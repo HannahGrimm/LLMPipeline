@@ -1,3 +1,0 @@
-['start', 'setup', 'extract', 'read_vars', 'prep_prompt', 'start_synth', 'end_synth', 'splice', 'verify', 'done']
-[0, 22, 35, 51, 51, 6837, 6841, 20888]
-[22, 13, 16, 0, 6786, 4, 14047]

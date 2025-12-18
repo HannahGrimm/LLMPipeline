@@ -1,1 +1,0 @@
-tmp[i] = data[i]; i = i + 1;

@@ -139,6 +139,8 @@ def execute_llm_pipeline(info: dict) -> bool:
     statement_path = normpath(info["statement_path"])
     statement_dir  = dirname(statement_path)
     temp_folder    = normpath(join(statement_dir, f"temp_{info['statement_file']}_{info['temp_number']}"))
+    # expose temp folder for downstream tooling / results
+    info["temp_folder"] = temp_folder
 
     # copy & sanitize
     temp_key = _setup_temp(statement_path, temp_folder, info["statement_file"])
@@ -156,11 +158,18 @@ def execute_llm_pipeline(info: dict) -> bool:
     pre_text, post_text = extract_pre_post_from_key(temp_key)
     info["timestamps"].append(time.time())
 
+    # attach extracted texts for later reporting
+    info["pre_text"] = pre_text
+    info["post_text"] = post_text
+
     # read variables from the given cbcmodel
     if not exists(info["cbcmodel_path"]):
         raise FileNotFoundError(f"cbcmodel not found:\n  {info['cbcmodel_path']}")
     variables = read_vars_from_corc_model(info["cbcmodel_path"], info["cbc_id"])
     info["timestamps"].append(time.time())
+
+    # include variables in the info dict for reporting
+    info["variables"] = variables
 
     # LLM synthesis
     info["timestamps"].append(time.time())
@@ -171,6 +180,22 @@ def execute_llm_pipeline(info: dict) -> bool:
         is_loop_update=info.get("isLoopUpdate", False)
     )
     info["timestamps"].append(time.time())
+
+    # save LLM input/output and synthesis timing into info for downstream consumers
+    info["llm_input"] = {
+        "variables": variables,
+        "pre_condition_text": pre_text,
+        "post_condition_text": post_text,
+        "is_loop_update": info.get("isLoopUpdate", False),
+    }
+    info["llm_output"] = java_codeblock
+    # estimate synth time from the two most recent timestamps (start/end synth)
+    try:
+        synth_end = info["timestamps"][-1]
+        synth_start = info["timestamps"][-2]
+        info["synthesis_seconds"] = float(synth_end - synth_start)
+    except Exception:
+        info["synthesis_seconds"] = None
 
     # persist snippet
     with open(join(temp_folder, "javaCode.txt"), "w", encoding="utf-8") as f:

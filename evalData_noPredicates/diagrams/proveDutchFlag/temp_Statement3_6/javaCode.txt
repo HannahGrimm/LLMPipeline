@@ -1,1 +1,0 @@
-int wt_preVersion = wt; wt = (1)+(wt_preVersion); 
