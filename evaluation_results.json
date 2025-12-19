@@ -1,1 +1,962 @@
-{}
+{
+  "1": {
+    "project": "DutchFlag",
+    "statement_file": "Statement1",
+    "cbc_id": "7a0a652e-1c05-45fa-9508-117e57b6e42d",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "A",
+          false,
+          "int[]"
+        ],
+        [
+          "t",
+          false,
+          "int"
+        ],
+        [
+          "wt",
+          true,
+          "int"
+        ],
+        [
+          "wb",
+          true,
+          "int"
+        ],
+        [
+          "bb",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((\\forall int q; (!(q >= 0 & q < 0) | A[q]=0)) & (\\forall int q; (!(q >= 0 & q < 0) | A[q]=1)) & (\\forall int q; (!(q >= A.length & q < A.length) | A[q]=2)) & 0<=0 & 0<=0 & 0<=A.length & A.length<=A.length) & A != null & A.length > 0 & 0 <= wb & wb <= wt & wt <= bb & bb <= A.length & \\forall int i; ((i >= 0 & i < A.length) -> (A[i] = 0 | A[i] = 1 | A[i] = 2)) & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; (!(q >= 0 & q < wb) | A[q]=0)) & (\\forall int q; (!(q >= wb & q < wt) | A[q]=1)) & (\\forall int q; (!(q >= bb & q < A.length) | A[q]=2)) & 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & A = A_old & t = t_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "wb = 0; wt = 0; bb = A.length",
+    "synthesis_seconds": 42.43689680099487
+  },
+  "2": {
+    "project": "DutchFlag",
+    "statement_file": "Statement2",
+    "cbc_id": "7bbf8178-b459-427d-b2b6-998af29635c8",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "A",
+          false,
+          "int[]"
+        ],
+        [
+          "t",
+          true,
+          "int"
+        ],
+        [
+          "wt",
+          true,
+          "int"
+        ],
+        [
+          "wb",
+          true,
+          "int"
+        ],
+        [
+          "bb",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((((\\forall int q; ((q >= 0 & q < wb) -> A[q]=0)) \n& (\\forall int q; ((q >= wb & q < wt) -> A[q]=1)) \n& (\\forall int q; ((q >= bb & q < A.length) -> A[q]=2)) \n& 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & (wt != bb)) & (A[wt] = 0)) & variantVar0 = bb-wt & A != null & A.length > 0 & 0 <= wb & wb <= wt & wt <= bb & bb <= A.length & \\forall int i; ((i >= 0 & i < A.length) -> (A[i] = 0 | A[i] = 1 | A[i] = 2)) & A.<created> = TRUE & A.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; ((q >= 0 & q < wb) -> A[q]=0)) \n& (\\forall int q; ((q >= wb & q < wt) -> A[q]=1)) \n& (\\forall int q; ((q >= bb & q < A.length) -> A[q]=2)) \n& 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & variantVar0 > bb-wt)",
+      "is_loop_update": true
+    },
+    "llm_output": "t = A[wt]; A[wt] = A[wb]; A[wb] = t; wt = wt + 1; wb = wb + 1;",
+    "synthesis_seconds": 158.28944277763367
+  },
+  "3": {
+    "project": "DutchFlag",
+    "statement_file": "Statement3",
+    "cbc_id": "eb36ac55-e482-49a8-8eeb-4ee5999a3e89",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "A",
+          false,
+          "int[]"
+        ],
+        [
+          "t",
+          true,
+          "int"
+        ],
+        [
+          "wt",
+          true,
+          "int"
+        ],
+        [
+          "wb",
+          true,
+          "int"
+        ],
+        [
+          "bb",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((((\\forall int q; (!(q >= 0 & q < wb) | A[q]=0)) & (\\forall int q; (!(q >= wb & q < wt) | A[q]=1)) & (\\forall int q; (!(q >= bb & q < A.length) | A[q]=2)) & 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & (wt != bb)) & (A[wt] = 1)) & variantVar0 = bb-wt & A != null & A.length > 0 & 0 <= wb & wb <= wt & wt <= bb & bb <= A.length & \\forall int i; ((i >= 0 & i < A.length) -> (A[i] = 0 | A[i] = 1 | A[i] = 2)) & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; (!(q >= 0 & q < wb) | A[q]=0)) & (\\forall int q; (!(q >= wb & q < wt) | A[q]=1)) & (\\forall int q; (!(q >= bb & q < A.length) | A[q]=2)) & 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & variantVar0 > bb-wt & A = A_old)",
+      "is_loop_update": true
+    },
+    "llm_output": "wt = wt + 1;",
+    "synthesis_seconds": 21.275314331054688
+  },
+  "4": {
+    "project": "DutchFlag",
+    "statement_file": "Statement4",
+    "cbc_id": "d5600931-ca8a-4f0b-bb86-10d3fdd35206",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "A",
+          false,
+          "int[]"
+        ],
+        [
+          "t",
+          true,
+          "int"
+        ],
+        [
+          "wt",
+          true,
+          "int"
+        ],
+        [
+          "wb",
+          true,
+          "int"
+        ],
+        [
+          "bb",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((((\\forall int q; ((q >= 0 & q < wb) -> A[q]=0)) \n& (\\forall int q; ((q >= wb & q < wt) -> A[q]=1)) \n& (\\forall int q; ((q >= bb & q < A.length) -> A[q]=2)) \n& 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & (wt != bb)) & (A[wt] = 2)) & variantVar0 = bb-wt & A != null & A.length > 0 & 0 <= wb & wb <= wt & wt <= bb & bb <= A.length & \\forall int i; ((i >= 0 & i < A.length) -> (A[i] = 0 | A[i] = 1 | A[i] = 2)) & A.<created> = TRUE & A.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; ((q >= 0 & q < wb) -> A[q]=0)) \n& (\\forall int q; ((q >= wb & q < wt) -> A[q]=1)) \n& (\\forall int q; ((q >= bb & q < A.length) -> A[q]=2)) \n& 0<=wb & wb<=wt & wt<=bb & bb<=A.length) & variantVar0 > bb-wt)",
+      "is_loop_update": true
+    },
+    "llm_output": "t = A[wt]; A[wt] = A[bb - 1]; A[bb - 1] = t; bb = bb - 1",
+    "synthesis_seconds": 141.9420325756073
+  },
+  "5": {
+    "project": "Exponentation",
+    "statement_file": "Statement1",
+    "cbc_id": "ace98c2d-1a79-43a0-b1b3-51a018756a44",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          false,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "b",
+          true,
+          "int"
+        ],
+        [
+          "z",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "((n > 0) & n > 0 & a > 0 & n < 6 & a < 6 & i >= 0 & i < n & wellFormed(heap))",
+      "post_condition_text": "((z * Helper.pow(b,i) = Helper.pow(a,n)) & n = n_old & a = a_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "i = n; b = a; z = 1",
+    "synthesis_seconds": 32.649017572402954
+  },
+  "6": {
+    "project": "Exponentation",
+    "statement_file": "Statement2",
+    "cbc_id": "eb50eeaa-84d9-49d8-bed2-26681b75d315",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          false,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "b",
+          true,
+          "int"
+        ],
+        [
+          "z",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "((((z * Helper.pow(b,i) = Helper.pow(a,n)) & (i != 0)) & (i%2 = 0)) & n > 0 & a > 0 & n < 6 & a < 6 & i >= 0 & i < n & wellFormed(heap))",
+      "post_condition_text": "((z * Helper.pow(b,i) = Helper.pow(a,n)) & n = n_old & a = a_old)",
+      "is_loop_update": false
+    },
+    "llm_output": ";",
+    "synthesis_seconds": 21.05738115310669
+  },
+  "7": {
+    "project": "Exponentation",
+    "statement_file": "Statement3",
+    "cbc_id": "a6d283e8-bf64-4630-b2da-5111ee35652a",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          false,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "b",
+          true,
+          "int"
+        ],
+        [
+          "z",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "((((z * Helper.pow(b,i) = Helper.pow(a,n)) & (i != 0)) & (i%2 = 1)) & n > 0 & a > 0 & n < 6 & a < 6 & i >= 0 & i < n & wellFormed(heap))",
+      "post_condition_text": "((z * Helper.pow(b,i) = Helper.pow(a,n)) & n = n_old & a = a_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "{\"java\": \"\"}",
+    "synthesis_seconds": 25.60105299949646
+  },
+  "8": {
+    "project": "FactorialGraphical",
+    "statement_file": "Statement1",
+    "cbc_id": "2e2f1799-f79e-4d3f-8205-261fd3cce41e",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          false,
+          "int"
+        ],
+        [
+          "f",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((n >= 0) & (n = 0)) & n >= 0 & n < 6 & wellFormed(heap))",
+      "post_condition_text": "((f = Helper.factorial(n)) & n = n_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "f = Helper.factorial(n);",
+    "synthesis_seconds": 8.819509267807007
+  },
+  "9": {
+    "project": "FactorialGraphical",
+    "statement_file": "Statement2",
+    "cbc_id": "a36cd4bb-d923-4ae2-887a-bd39f0009448",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          false,
+          "int"
+        ],
+        [
+          "f",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((n >= 0) & (n = 1)) & n >= 0 & n < 6 & wellFormed(heap))",
+      "post_condition_text": "((f = Helper.factorial(n)) & n = n_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "f = Helper.factorial(n);",
+    "synthesis_seconds": 9.151955366134644
+  },
+  "10": {
+    "project": "FactorialGraphical",
+    "statement_file": "Statement3",
+    "cbc_id": "1c978aff-4acc-444b-acb4-3c5e7a511b51",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          false,
+          "int"
+        ],
+        [
+          "f",
+          true,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((n >= 0) & (n >= 2)) & n >= 0 & n < 6 & wellFormed(heap))",
+      "post_condition_text": "((f = Helper.factorial(n)) & n = n_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "f = Helper.factorial(n);",
+    "synthesis_seconds": 6.617410182952881
+  },
+  "11": {
+    "project": "LinearSearch",
+    "statement_file": "Statement1",
+    "cbc_id": "49e58b54-816f-4524-8597-947ef5377b07",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "x",
+          false,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((\\exists int q; (q >= 0 & q < A.length & A[q]=x))) & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & (\\exists int q; (q >= 0 & q < A.length & A[q]=x)) & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\exists int q; (q >= 0 & q < A.length & A[q]=x)) & i = A.length-1) & x = x_old & A = A_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "i = A.length - 1;",
+    "synthesis_seconds": 9.75765323638916
+  },
+  "12": {
+    "project": "LinearSearch",
+    "statement_file": "Statement2",
+    "cbc_id": "432c68bb-e8b1-4f1a-a964-4811a12821dd",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "x",
+          false,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((!(\\exists int q; (q >= i+1 & q < A.length & A[q]=x))) & (A[i] != x)) & variantVar0 = i & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & (\\exists int q; (q >= 0 & q < A.length & A[q]=x)) & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "((!(\\exists int q; (q >= i+1 & q < A.length & A[q]=x))) & variantVar0 > i & x = x_old & A = A_old)",
+      "is_loop_update": true
+    },
+    "llm_output": "i = i - 1;",
+    "synthesis_seconds": 64.90788292884827
+  },
+  "13": {
+    "project": "Logarithm",
+    "statement_file": "Statement1",
+    "cbc_id": "1f27ded7-6019-4a38-ad2a-fe251c148606",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          true,
+          "int"
+        ],
+        [
+          "l",
+          true,
+          "int"
+        ],
+        [
+          "N",
+          false,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "((N > 0) & N > 0 & n <= N & n >= 1 & l >= 0 & l < N & N < 20 & wellFormed(heap))",
+      "post_condition_text": "((N >= n*Helper.pow(2,l) & N < (n+1)*Helper.pow(2,l)) & N = N_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "l = 0; n = N;",
+    "synthesis_seconds": 25.78325366973877
+  },
+  "14": {
+    "project": "Logarithm",
+    "statement_file": "Statement2",
+    "cbc_id": "da424e45-3cf7-499e-b12f-9907bbf1939a",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "n",
+          true,
+          "int"
+        ],
+        [
+          "l",
+          true,
+          "int"
+        ],
+        [
+          "N",
+          false,
+          "int"
+        ]
+      ],
+      "pre_condition_text": "(((N >= n*Helper.pow(2,l) & N < (n+1)*Helper.pow(2,l)) & (n != 1)) & N > 0 & n <= N & n >= 1 & l >= 0 & l < N & N < 20 & wellFormed(heap))",
+      "post_condition_text": "((N >= n*Helper.pow(2,l) & N < (n+1)*Helper.pow(2,l)) & N = N_old)",
+      "is_loop_update": true
+    },
+    "llm_output": ";",
+    "synthesis_seconds": 32.76498603820801
+  },
+  "15": {
+    "project": "maxElement",
+    "statement_file": "Statement1",
+    "cbc_id": "5dea9071-b406-4a59-94fe-4aca14fe41f9",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "j",
+          false,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((A.length > 0) & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & j >= 0 & j <= A.length & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "((A.length > 0 & i = 0) & j = j_old & A = A_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "i = 0;",
+    "synthesis_seconds": 9.311982870101929
+  },
+  "16": {
+    "project": "maxElement",
+    "statement_file": "Statement2",
+    "cbc_id": "96c3f533-8896-4201-97c0-43edc5cb0ba8",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((A.length > 0 & i = 0) & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & j >= 0 & j <= A.length & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "((A.length > 0 & i = 0 & j = 1) & A = A_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "j = 1;",
+    "synthesis_seconds": 19.05167293548584
+  },
+  "17": {
+    "project": "maxElement",
+    "statement_file": "Statement3",
+    "cbc_id": "ddda60dd-57fd-4da0-aa9e-08b4cb7bb75a",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((((\\forall int q; (!(q >= 0 & q < j) | A[i]>=A[q]))) & (j != A.length)) & (A[j] > A[i])) & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & j >= 0 & j <= A.length & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; (!(q >= 0 & q < j+1) | A[i]>=A[q]))) & A = A_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "i = j;",
+    "synthesis_seconds": 27.992997884750366
+  },
+  "18": {
+    "project": "maxElement",
+    "statement_file": "Statement4",
+    "cbc_id": "542948eb-3277-4648-84a1-10aa21959227",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((((\\forall int q; (!(q >= 0 & q < j) | A[i]>=A[q]))) & (j != A.length)) & (A[j] <= A[i])) & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & j >= 0 & j <= A.length & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; (!(q >= 0 & q < j+1) | A[i]>=A[q]))) & j = j_old & A = A_old)",
+      "is_loop_update": false
+    },
+    "llm_output": ";",
+    "synthesis_seconds": 20.6820650100708
+  },
+  "19": {
+    "project": "maxElement",
+    "statement_file": "Statement5",
+    "cbc_id": "ccde479c-9742-4796-b71f-c8280ee84b02",
+    "result": true,
+    "llm_input": {
+      "variables": [
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "A",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((\\forall int q; (!(q >= 0 & q < j+1) | A[i]>=A[q]))) & variantVar0 = A.length - j & A != null & A.length > 0 & A.length < 10 & i >= 0 & i < A.length & j >= 0 & j <= A.length & A.<created> = TRUE & A.<created> = TRUE & A_old.<created> = TRUE & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int q; (!(q >= 0 & q < j) | A[i]>=A[q]))) & variantVar0 > A.length - j & A = A_old)",
+      "is_loop_update": true
+    },
+    "llm_output": "j = j + 1;",
+    "synthesis_seconds": 39.07323217391968
+  },
+  "20": {
+    "project": "push",
+    "statement_file": "Statement1",
+    "cbc_id": "46bcfdb2-c9f2-4bce-92cb-680a6a5ffe31",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          false,
+          "int"
+        ],
+        [
+          "tmp",
+          true,
+          "int[]"
+        ],
+        [
+          "newTop",
+          false,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((true) & data != null & length(data) >= 0 & i >= 0 & data1_oldVal = data & tmp != null & tmp.<created> = TRUE & data.<created> = TRUE & tmp.<created> = TRUE & data.<created> = TRUE & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "((length(tmp) = length(data) + 1) & i = i_old & newTop = newTop_old & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "tmp = new int[data.length + 1];",
+    "synthesis_seconds": 12.80751085281372
+  },
+  "21": {
+    "project": "push",
+    "statement_file": "Statement2",
+    "cbc_id": "9cd48691-6560-4bf2-a087-855e529208ec",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          false,
+          "int"
+        ],
+        [
+          "tmp",
+          true,
+          "int[]"
+        ],
+        [
+          "newTop",
+          false,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((length(tmp) = length(data) + 1) & data != null & length(data) >= 0 & i >= 0 & data1_oldVal = data & tmp != null & tmp.<created> = TRUE & data.<created> = TRUE & tmp.<created> = TRUE & data.<created> = TRUE & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "((length(tmp) = length(data) + 1 & tmp[length(tmp)-1] = newTop) & i = i_old & newTop = newTop_old & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "tmp[tmp.length - 1] = newTop;",
+    "synthesis_seconds": 10.600451469421387
+  },
+  "22": {
+    "project": "push",
+    "statement_file": "Statement3",
+    "cbc_id": "14501367-c20c-4d64-9a70-a85f16fcdc46",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "tmp",
+          true,
+          "int[]"
+        ],
+        [
+          "newTop",
+          false,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((length(tmp) = length(data) + 1 & tmp[length(tmp)-1] = newTop) & data != null & length(data) >= 0 & i >= 0 & data1_oldVal = data & tmp != null & tmp.<created> = TRUE & data.<created> = TRUE & tmp.<created> = TRUE & data.<created> = TRUE & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "((length(tmp) = length(data) + 1 & tmp[length(tmp)-1] = newTop & (\\forall int j; (0 <= j & j < i -> data[j] = tmp[j])) & i = 0) & newTop = newTop_old & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "i = 0;",
+    "synthesis_seconds": 9.18121886253357
+  },
+  "23": {
+    "project": "push",
+    "statement_file": "Statement4",
+    "cbc_id": "b7c5390b-e57e-4248-9ffa-b621fc1ead52",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "tmp",
+          true,
+          "int[]"
+        ],
+        [
+          "newTop",
+          false,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((length(tmp) = length(data) + 1 & tmp[length(tmp)-1] = newTop & (\\forall int j; (0 <= j & j < i -> data[j] = tmp[j]))) & (i < length(data))) & data != null & length(data) >= 0 & i >= 0 & data1_oldVal = data & tmp != null & tmp.<created> = TRUE & data.<created> = TRUE & tmp.<created> = TRUE & data.<created> = TRUE & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "((length(tmp) = length(data) + 1 & tmp[length(tmp)-1] = newTop & (\\forall int j; (0 <= j & j < i -> data[j] = tmp[j]))) & newTop = newTop_old & data = data_old)",
+      "is_loop_update": true
+    },
+    "llm_output": "tmp[i] = data[i]; i = i + 1",
+    "synthesis_seconds": 29.832697868347168
+  },
+  "24": {
+    "project": "push",
+    "statement_file": "Statement5",
+    "cbc_id": "7b5933de-0764-4a3c-92b4-a3d7e52365f7",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "tmp",
+          true,
+          "int[]"
+        ],
+        [
+          "newTop",
+          false,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((length(tmp) = length(data) + 1 & tmp[length(tmp)-1] = newTop & (\\forall int i; (0 <= i & i < length(data) -> data[i] = tmp[i]))) & data != null & length(data) >= 0 & i >= 0 & data1_oldVal = data & tmp != null & tmp.<created> = TRUE & data.<created> = TRUE & tmp.<created> = TRUE & data.<created> = TRUE & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "(((\\exists int z;(0 <= z & z < length(data) & data[z] = newTop)) & (\\forall int k; (0 <= k & k < length(data1_oldVal) -> (\\exists int z; (0 <= z & z < length(data) & data[z] = data1_oldVal[k])))) & data[length(data) - 1] = newTop) & newTop = newTop_old & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "{\"java\": \"\"}",
+    "synthesis_seconds": 41.68597388267517
+  },
+  "25": {
+    "project": "sort",
+    "statement_file": "Statement1",
+    "cbc_id": "8ff61343-3a7c-4c42-9a03-5f24daa86a62",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "tmp",
+          false,
+          "int"
+        ],
+        [
+          "j",
+          false,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((data = data1_oldVal) & data != null & i >= 0 & i <= length(data) & j <= length(data)-2 & j >=i-1 & data.<created> = TRUE & data.<created> = TRUE & int[]::exactInstance(self.data) = TRUE & self.data.<created> = TRUE & self.data!= null & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "((i = 0) & tmp = tmp_old & j = j_old & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "i = 0;",
+    "synthesis_seconds": 5.32317328453064
+  },
+  "26": {
+    "project": "sort",
+    "statement_file": "Statement2",
+    "cbc_id": "53c0e0d4-c4c8-424d-854d-16d218e967d5",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "tmp",
+          false,
+          "int"
+        ],
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "((((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))) & (i < length(data))) & data != null & i >= 0 & i <= length(data) & j <= length(data)-2 & j >=i-1 & data.<created> = TRUE & data.<created> = TRUE & int[]::exactInstance(self.data) = TRUE & self.data.<created> = TRUE & self.data!= null & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m])))) & j = length(data)-2) & tmp = tmp_old & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "j = data.length - 2;",
+    "synthesis_seconds": 17.56096053123474
+  },
+  "27": {
+    "project": "sort",
+    "statement_file": "Statement3",
+    "cbc_id": "fe4ba352-9569-4b32-aac7-a535cfafd3da",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "tmp",
+          true,
+          "int"
+        ],
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))\n& (\\forall int h; (j < h & h < length(data) -> data[j+1] <= data[h]))) & (j>=i)) & (data[j] > data[j+1])) & data != null & i >= 0 & i <= length(data) & j <= length(data)-2 & j >=i-1 & data.<created> = TRUE & data.<created> = TRUE & int[]::exactInstance(self.data) = TRUE & self.data.<created> = TRUE & self.data!= null & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))\n& (\\forall int h; (j < h & h < length(data) -> data[j] <= data[h]))) & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "j = j + 1;",
+    "synthesis_seconds": 35.91540837287903
+  },
+  "28": {
+    "project": "sort",
+    "statement_file": "Statement4",
+    "cbc_id": "a03cb51e-bc6f-4e03-9621-99c813867edc",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "tmp",
+          true,
+          "int"
+        ],
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))\n& (\\forall int h; (j < h & h < length(data) -> data[j] <= data[h]))) & data != null & i >= 0 & i <= length(data) & j <= length(data)-2 & j >=i-1 & data.<created> = TRUE & data.<created> = TRUE & int[]::exactInstance(self.data) = TRUE & self.data.<created> = TRUE & self.data!= null & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))\n& (\\forall int h; (j < h & h < length(data) -> data[j+1] <= data[h]))) & data = data_old)",
+      "is_loop_update": false
+    },
+    "llm_output": "j = j - 1;",
+    "synthesis_seconds": 98.40005898475647
+  },
+  "29": {
+    "project": "sort",
+    "statement_file": "Statement5",
+    "cbc_id": "a1c8655a-fa84-47eb-9143-c2279a1e38c6",
+    "result": false,
+    "llm_input": {
+      "variables": [
+        [
+          "tmp",
+          true,
+          "int"
+        ],
+        [
+          "j",
+          true,
+          "int"
+        ],
+        [
+          "i",
+          true,
+          "int"
+        ],
+        [
+          "data",
+          false,
+          "int[]"
+        ]
+      ],
+      "pre_condition_text": "(((\\forall int k; (0 <= k & k < i+1 ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))) & data != null & i >= 0 & i <= length(data) & j <= length(data)-2 & j >=i-1 & data.<created> = TRUE & data.<created> = TRUE & int[]::exactInstance(self.data) = TRUE & self.data.<created> = TRUE & self.data!= null & data_old.<created> = TRUE & self.<created>=TRUE & IntList::exactInstance(self)=TRUE & !self = null & self.<inv> & wellFormed(heap))",
+      "post_condition_text": "(((\\forall int k; (0 <= k & k < i ->\n(\\forall int m; (k < m & m < length(data) ->\ndata[k] <= data[m]))))) & data = data_old)",
+      "is_loop_update": true
+    },
+    "llm_output": "i = i - 1;",
+    "synthesis_seconds": 44.183072090148926
+  }
+}

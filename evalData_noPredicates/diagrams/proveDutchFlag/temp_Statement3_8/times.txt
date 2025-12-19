@@ -1,0 +1,3 @@
+['start', 'setup', 'extract', 'read_vars', 'prep_prompt', 'start_synth', 'end_synth', 'splice', 'verify', 'done']
+[0, 13, 13, 15, 15, 29059, 29065, 46901]
+[13, 0, 2, 0, 29044, 6, 17836]

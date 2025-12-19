@@ -99,7 +99,7 @@ class LLMEvaluation:
     def execute_evaluation(
         self,
         task_dict: Dict[int, Dict],
-        num_runs: int = 1,
+        num_runs: int = 2,
         skip_projects: Optional[Dict[str, List[int]]] = None,
         verbose: bool = True,
     ) -> Dict[int, Dict]:
@@ -287,18 +287,18 @@ def main():
     # Configuration
     src_dir = r"C:\Users\hanna\OneDrive\Dokumente\LLMPipeline"
     projects_to_evaluate = None  # Specify projects or None for all
-    num_runs = 10  # Number of times to run each statement
+    num_runs = 2  # Number of times to run each statement
 
     # Projects/statements to skip (optional)
     skip_projects = {
-        #"LinearSearch": [1,2],
-        #"maxElement": [1,2,3,4,5],
-        #"DutchFlag": [1,2,3,4],
-        #"sort": [1,2,3,4,5],
-        #"Exponentation": [1,2,3],
-        #"FactorialGraphical": [1,2,3],
-        #"Logarithm": [1,2],
-        #"push": [1,2,3,4,5]  # Add statement numbers to skip, e.g., [1, 3]
+        "LinearSearch": [1],
+        "maxElement": [1,2,3,4,5],
+        "DutchFlag": [1,2,3,4],
+        "sort": [1,2,3,4,5],
+        "Exponentation": [1,2,3],
+        "FactorialGraphical": [1,2,3],
+        "Logarithm": [1,2],
+        "push": [1,2,3,4,5]  # Add statement numbers to skip, e.g., [1, 3]
         
         
     }

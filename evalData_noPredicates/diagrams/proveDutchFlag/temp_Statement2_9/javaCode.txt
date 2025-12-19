@@ -1,0 +1,1 @@
+t = A[wt]; A[wt] = A[wb]; A[wb] = t; wt = wt + 1; wb = wb + 1;

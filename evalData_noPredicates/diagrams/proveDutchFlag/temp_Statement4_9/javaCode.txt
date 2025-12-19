@@ -1,0 +1,1 @@
+t = A[wt]; A[wt] = A[bb - 1]; A[bb - 1] = t; bb = bb - 1

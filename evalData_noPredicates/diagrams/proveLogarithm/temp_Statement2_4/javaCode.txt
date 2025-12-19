@@ -1,0 +1,1 @@
+if (l > 0) { if (N < (2 * n + 1) * Helper.pow(2, l - 1)) { n = 2 * n; } else { n = 2 * n + 1; } l = l - 1; }
